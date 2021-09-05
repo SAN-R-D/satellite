@@ -1,0 +1,53 @@
+# Basic foreman-rake commands from KBase
+
+https://access.redhat.com/solutions/2755731 Task Cleanup
+https://access.redhat.com/solutions/3078361 running a foreman-rake console script from a bash
+
+# Basic foreman-rake console commands 
+
+# foreman-rake commands as below
+
+# foreman-rake katello:change_download_policy                        
+### Change the download policy of all repos
+
+# foreman-rake katello:clean_backend_objects                         
+### Cleans backend objects (hosts) that are missing in one or more backend systems
+
+# foreman-rake katello:correct_puppet_environments                   
+### Correct missing pulp repositories for puppet environments
+
+# foreman-rake katello:correct_repositories                          
+### Correct missing pulp repositories
+
+# foreman-rake katello:refresh_pulp_repo_details                     
+### Refresh repository metadata for all repositories
+
+# foreman-rake katello:refresh_sync_schedule                         
+### Refresh pulp sync schedules
+
+# foreman-rake katello:reimport                                      
+### Reimports information from backend systems
+
+# foreman-rake katello:unify_hosts                                  
+### Unify hosts that have registered with both fqdn and shortname
+
+# foreman-rake katello:upgrades:3.10:clear_invalid_repo_credentials  
+### Clear invalid credentials for repositories
+
+# foreman-rake katello:upgrades:3.11:import_yum_metadata             
+### Import yum metadata file units from pulp
+
+# foreman-rake katello:upgrades:3.11:update_puppet_repos             
+### update puppet repos to regenerate pulp configuration
+
+# foreman-rake katello:upgrades:3.8:clear_checksum_type              
+### Clear checksum type for on-demand repositories
+
+# foreman-rake katello:upgrades:3.9:migrate_sync_plans               
+### Migrate Pulp Sync Plans to new recurring logics
+
+# foreman-rake katello:virt_who_report                              
+### Report on hypervisors without VDC subscriptions and guests consuming virtual entitlements
+
+
+
