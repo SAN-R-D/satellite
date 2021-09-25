@@ -1,0 +1,359 @@
+#Updating your existing Satellite Server to a new minor version, 
+#for example, from 6.9.5 to 6.9.6 release
+
+# rpm  -qa satellite
+satellite-6.9.5.1-1.el7sat.noarch
+
+# subscription-manager repos --enable \
+> rhel-7-server-satellite-maintenance-6-rpms
+Repository 'rhel-7-server-satellite-maintenance-6-rpms' is enabled for this system.
+
+# satellite-maintain upgrade list-versions
+Checking for new version of satellite-maintain...
+Nothing to update, can't find new version of satellite-maintain.
+6.9.z
+
+# yum repolist
+Loaded plugins: foreman-protector, product-id, search-disabled-repos, subscription-manager
+
+WARNING: Excluding 12841 packages due to foreman-protector. 
+Use foreman-maintain packages install/update <package> 
+to safely install packages without restrictions.
+Use foreman-maintain upgrade run for full upgrade.
+
+repo id                                            repo name                                                                 status
+rhel-7-server-ansible-2.9-rpms/x86_64              Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server           0+49
+rhel-7-server-rpms/7Server/x86_64                  Red Hat Enterprise Linux 7 Server (RPMs)                                  197+31,995
+rhel-7-server-satellite-6.9-rpms/x86_64            Red Hat Satellite 6.9 (for RHEL 7 Server) (RPMs)                               0+698
+rhel-7-server-satellite-maintenance-6-rpms/x86_64  Red Hat Satellite Maintenance 6 (for RHEL 7 Server) (RPMs)                     28+24
+rhel-server-rhscl-7-rpms/7Server/x86_64            Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server     0+13,560
+repolist: 225
+
+# su - postgres -c "psql -d foreman -c 'select label,count(label),state,result from foreman_tasks_tasks where state <> '\''stopped'\'' group by label,state,result ORDER BY label;'"
+                        label                         | count |   state   | result  
+------------------------------------------------------+-------+-----------+---------
+ Actions::Katello::SyncPlan::Run                      |     3 | scheduled | pending
+ CreateExpiredManifestNotifications                   |     1 | scheduled | pending
+ CreatePulpDiskSpaceNotifications                     |     1 | scheduled | pending
+ CreateRssNotifications                               |     1 | scheduled | pending
+ ForemanInventoryUpload::Async::GenerateAllReportsJob |     1 | scheduled | pending
+ InsightsCloud::Async::InsightsClientStatusAging      |     1 | scheduled | pending
+ InsightsCloud::Async::InsightsScheduledSync          |     1 | scheduled | pending
+ InventorySync::Async::InventoryScheduledSync         |     1 | scheduled | pending
+ SendExpireSoonNotifications                          |     1 | scheduled | pending
+ StoredValuesCleanupJob                               |     1 | scheduled | pending
+(10 rows)
+
+# satellite-maintain upgrade check --target-version 6.9.z
+Checking for new version of satellite-maintain...
+
+rubygem-foreman_maintain.noarch                      1:0.7.13-1.el7sat                       rhel-7-server-satellite-maintenance-6-rpms
+
+Updating satellite-maintain package.
+
+The satellite-maintain package successfully updated.
+Re-run satellite-maintain with required options!
+
+# satellite-maintain upgrade check --target-version 6.9.z
+Checking for new version of satellite-maintain...
+Nothing to update, can't find new version of satellite-maintain.
+Running preparation steps required to run the next scenarios
+================================================================================
+Check whether system has any non Red Hat repositories (e.g.: EPEL) enabled: 
+/ Checking repositories enabled on the system                         [OK]      
+--------------------------------------------------------------------------------
+
+
+Running Checks before upgrading to Satellite 6.9.z
+================================================================================
+Clean old Kernel and initramfs files from tftp-boot:                  [OK]
+--------------------------------------------------------------------------------
+Check number of fact names in database:                               [OK]
+--------------------------------------------------------------------------------
+Check whether all services are running:                               [OK]
+--------------------------------------------------------------------------------
+Check whether all services are running using the ping call:           [OK]
+--------------------------------------------------------------------------------
+Check for paused tasks:                                               [OK]
+--------------------------------------------------------------------------------
+Check to verify no empty CA cert requests exist:                      [OK]
+--------------------------------------------------------------------------------
+Check whether system is self-registered or not:                       [OK]
+--------------------------------------------------------------------------------
+Check to make sure root(/) partition has enough space:                [OK]
+--------------------------------------------------------------------------------
+Check to make sure /var/lib/candlepin has enough space:               [OK]
+--------------------------------------------------------------------------------
+Check to validate candlepin database:                                 [OK]
+--------------------------------------------------------------------------------
+Check for running tasks:                                              [OK]
+--------------------------------------------------------------------------------
+Check for old tasks in paused/stopped state:                          [FAIL]
+Found 44 paused or stopped task(s) older than 30 days
+--------------------------------------------------------------------------------
+Continue with step [Delete old tasks]?, [y(yes), n(no)] y
+Delete tasks:                                                                   
+- Deleted old tasks: 44                                               [OK]      
+--------------------------------------------------------------------------------
+Rerunning the check after fix procedure
+Check for old tasks in paused/stopped state:                          [OK]
+--------------------------------------------------------------------------------
+Check for pending tasks which are safe to delete:                     [OK]
+--------------------------------------------------------------------------------
+Check for tasks in planning state:                                    [OK]
+--------------------------------------------------------------------------------
+Check to verify if any hotfix installed on system: 
+- Checking for presence of hotfix(es). It may take some time to verify.         
+                                                                      [OK]
+--------------------------------------------------------------------------------
+Check whether system has any non Red Hat repositories (e.g.: EPEL) enabled: 
+- Checking repositories enabled on the system                         [OK]      
+--------------------------------------------------------------------------------
+Check if TMOUT environment variable is set:                           [OK]
+--------------------------------------------------------------------------------
+Check if any upstream repositories are enabled on system: 
+- Checking for presence of upstream repositories                      [OK]      
+--------------------------------------------------------------------------------
+Check for roles that have filters with multiple resources attached:   [OK]
+--------------------------------------------------------------------------------
+Check for duplicate permissions from database:                        [OK]
+--------------------------------------------------------------------------------
+Check whether reports have correct associations:                      [OK]
+--------------------------------------------------------------------------------
+Check to validate yum configuration before upgrade:                   [OK]
+--------------------------------------------------------------------------------
+Validate availability of repositories: 
+/ Validating availability of repositories for 6.9                     [OK]      
+--------------------------------------------------------------------------------
+
+# satellite-maintain upgrade run --target-version 6.9.z
+Checking for new version of satellite-maintain...
+Nothing to update, can't find new version of satellite-maintain.
+Running preparation steps required to run the next scenarios
+================================================================================
+Check whether system has any non Red Hat repositories (e.g.: EPEL) enabled: 
+- Checking repositories enabled on the system                         [OK]      
+--------------------------------------------------------------------------------
+
+
+Running Checks before upgrading to Satellite 6.9.z
+================================================================================
+Clean old Kernel and initramfs files from tftp-boot:                  [OK]
+--------------------------------------------------------------------------------
+Check number of fact names in database:                               [OK]
+--------------------------------------------------------------------------------
+Check whether all services are running:                               [OK]
+--------------------------------------------------------------------------------
+Check whether all services are running using the ping call:           [OK]
+--------------------------------------------------------------------------------
+Check for paused tasks:                                               [OK]
+--------------------------------------------------------------------------------
+Check to verify no empty CA cert requests exist:                      [OK]
+--------------------------------------------------------------------------------
+Check whether system is self-registered or not:                       [OK]
+--------------------------------------------------------------------------------
+Check to make sure root(/) partition has enough space:                [OK]
+--------------------------------------------------------------------------------
+Check to make sure /var/lib/candlepin has enough space:               [OK]
+--------------------------------------------------------------------------------
+Check to validate candlepin database:                                 [OK]
+--------------------------------------------------------------------------------
+Check for running tasks:                                              [OK]
+--------------------------------------------------------------------------------
+Check for old tasks in paused/stopped state:                          [OK]
+--------------------------------------------------------------------------------
+Check for pending tasks which are safe to delete:                     [OK]
+--------------------------------------------------------------------------------
+Check for tasks in planning state:                                    [OK]
+--------------------------------------------------------------------------------
+Check to verify if any hotfix installed on system: 
+\ Checking for presence of hotfix(es). It may take some time to verify.         
+                                                                      [OK]
+--------------------------------------------------------------------------------
+Check whether system has any non Red Hat repositories (e.g.: EPEL) enabled: 
+| Checking repositories enabled on the system                         [OK]      
+--------------------------------------------------------------------------------
+Check if TMOUT environment variable is set:                           [OK]
+--------------------------------------------------------------------------------
+Check if any upstream repositories are enabled on system: 
+| Checking for presence of upstream repositories                      [OK]      
+--------------------------------------------------------------------------------
+Check for roles that have filters with multiple resources attached:   [OK]
+--------------------------------------------------------------------------------
+Check for duplicate permissions from database:                        [OK]
+--------------------------------------------------------------------------------
+Check whether reports have correct associations:                      [OK]
+--------------------------------------------------------------------------------
+Check to validate yum configuration before upgrade:                   [OK]
+--------------------------------------------------------------------------------
+Validate availability of repositories: 
+/ Validating availability of repositories for 6.9                     [OK]      
+--------------------------------------------------------------------------------
+
+
+The pre-upgrade checks indicate that the system is ready for upgrade.
+It's recommended to perform a backup at this stage.
+Confirm to continue with the modification part of the upgrade, [y(yes), n(no), q(quit)] y
+Running Procedures before migrating to Satellite 6.9.z                          
+================================================================================
+disable active sync plans: 
+- Total 0 sync plans are now disabled.                                [OK]      
+--------------------------------------------------------------------------------
+Add maintenance_mode chain to iptables:                               [OK]
+--------------------------------------------------------------------------------
+Stop applicable services: 
+
+Stopping the following service(s):
+rh-mongodb34-mongod, postgresql, qdrouterd, qpidd, rh-redis5-redis, squid, pulp_celerybeat, pulp_resource_manager, pulp_streamer, pulp_workers, smart_proxy_dynflow_core, tomcat, dynflow-sidekiq@orchestrator, foreman, httpd, puppetserver, dynflow-sidekiq@worker, dynflow-sidekiq@worker-hosts-queue, foreman-proxy
+/ stopping puppetserver                                                         
+Warning: Stopping foreman.service, but it can still be activated by:
+  foreman.socket
+\ All services stopped                                                [OK]      
+--------------------------------------------------------------------------------
+
+
+Running preparation steps required to run the next scenarios
+================================================================================
+Check if tooling for package locking is installed:                    [OK]
+--------------------------------------------------------------------------------
+
+
+Running Migration scripts to Satellite 6.9.z
+================================================================================
+Setup repositories: 
+| Configuring repositories for 6.9                                    [OK]      
+--------------------------------------------------------------------------------
+Unlock packages:                                                      [OK]
+--------------------------------------------------------------------------------
+Update package(s) :                                                   [OK]
+--------------------------------------------------------------------------------
+Procedures::Installer::Upgrade: 2021-09-25 02:45:24 [NOTICE] [root] Loading default values from puppet modules...
+2021-09-25 02:45:35 [NOTICE] [root] ... finished
+2021-09-25 02:45:40 [WARN  ] [pre_validations] Skipping system checks.
+2021-09-25 02:45:40 [NOTICE] [root] Running validation checks
+2021-09-25 02:45:49 [WARN  ] [pre] Skipping system checks.
+2021-09-25 02:45:49 [WARN  ] [pre] Skipping system checks.
+2021-09-25 02:45:58 [NOTICE] [configure] Starting system configuration.
+  The total number of configuration tasks may increase during the run.
+  Observe logs or specify --verbose-log-level to see individual configuration tasks.
+2021-09-25 02:46:24 [NOTICE] [configure] 100 out of 2372 done.
+2021-09-25 02:46:25 [NOTICE] [configure] 200 out of 2372 done.
+2021-09-25 02:46:25 [NOTICE] [configure] 300 out of 2372 done.
+2021-09-25 02:46:27 [NOTICE] [configure] 400 out of 2372 done.
+2021-09-25 02:46:51 [NOTICE] [configure] 500 out of 2372 done.
+2021-09-25 02:46:55 [NOTICE] [configure] 600 out of 2372 done.
+2021-09-25 02:46:57 [NOTICE] [configure] 700 out of 2374 done.
+2021-09-25 02:46:57 [NOTICE] [configure] 800 out of 2374 done.
+2021-09-25 02:47:01 [NOTICE] [configure] 1000 out of 2377 done.
+2021-09-25 02:47:02 [NOTICE] [configure] 1100 out of 2378 done.
+2021-09-25 02:47:03 [NOTICE] [configure] 1200 out of 2379 done.
+2021-09-25 02:47:03 [NOTICE] [configure] 1300 out of 2381 done.
+2021-09-25 02:47:03 [NOTICE] [configure] 1400 out of 2384 done.
+2021-09-25 02:47:08 [NOTICE] [configure] 1500 out of 2384 done.
+2021-09-25 02:47:24 [NOTICE] [configure] 1600 out of 2386 done.
+2021-09-25 02:47:24 [NOTICE] [configure] 1700 out of 2386 done.
+2021-09-25 03:04:17 [NOTICE] [configure] 1800 out of 2386 done.
+2021-09-25 03:04:17 [NOTICE] [configure] 1900 out of 2386 done.
+2021-09-25 03:06:04 [NOTICE] [configure] 2000 out of 3190 done.
+2021-09-25 03:06:04 [NOTICE] [configure] 2100 out of 3190 done.
+2021-09-25 03:06:05 [NOTICE] [configure] 2200 out of 3190 done.
+2021-09-25 03:06:05 [NOTICE] [configure] 2300 out of 3190 done.
+2021-09-25 03:06:05 [NOTICE] [configure] 2400 out of 3190 done.
+2021-09-25 03:06:06 [NOTICE] [configure] 2500 out of 3190 done.
+2021-09-25 03:06:06 [NOTICE] [configure] 2600 out of 3190 done.
+2021-09-25 03:06:06 [NOTICE] [configure] 2700 out of 3190 done.
+2021-09-25 03:06:07 [NOTICE] [configure] 2800 out of 3190 done.
+2021-09-25 03:09:52 [NOTICE] [configure] 2900 out of 3190 done.
+2021-09-25 03:09:52 [NOTICE] [configure] 3000 out of 3190 done.
+2021-09-25 03:10:12 [NOTICE] [configure] 3100 out of 3190 done.
+2021-09-25 03:10:36 [NOTICE] [configure] System configuration has finished.
+  Success!
+  * Satellite is running at https://satellite.example.com
+
+  * To install an additional Capsule on separate machine continue by running:
+
+      capsule-certs-generate --foreman-proxy-fqdn "$CAPSULE" --certs-tar "/root/$CAPSULE-certs.tar"
+  * Capsule is running at https://satellite.example.com:9090
+
+  The full log is at /var/log/foreman-installer/satellite.log
+Package versions are being locked.
+                                      [OK]
+--------------------------------------------------------------------------------
+Execute upgrade:run rake task:                                        [OK]
+--------------------------------------------------------------------------------
+
+
+Running Procedures after migrating to Satellite 6.9.z
+================================================================================
+Start applicable services: 
+
+Starting the following service(s):
+rh-mongodb34-mongod, postgresql, qdrouterd, qpidd, rh-redis5-redis, squid, pulp_celerybeat, pulp_resource_manager, pulp_streamer, pulp_workers, smart_proxy_dynflow_core, tomcat, dynflow-sidekiq@orchestrator, foreman, httpd, puppetserver, dynflow-sidekiq@worker, dynflow-sidekiq@worker-hosts-queue, foreman-proxy
+\ All services started                                                [OK]      
+--------------------------------------------------------------------------------
+re-enable sync plans: 
+| Total 0 sync plans are now enabled.                                 [OK]      
+--------------------------------------------------------------------------------
+Remove maintenance_mode chain from iptables:                          [OK]
+--------------------------------------------------------------------------------
+
+
+Running Checks after upgrading to Satellite 6.9.z
+================================================================================
+Clean old Kernel and initramfs files from tftp-boot:                  [OK]
+--------------------------------------------------------------------------------
+Check number of fact names in database:                               [OK]
+--------------------------------------------------------------------------------
+Check whether all services are running:                               [OK]
+--------------------------------------------------------------------------------
+Check whether all services are running using the ping call:           [OK]
+--------------------------------------------------------------------------------
+Check for paused tasks:                                               [OK]
+--------------------------------------------------------------------------------
+Check to verify no empty CA cert requests exist:                      [OK]
+--------------------------------------------------------------------------------
+Check whether system is self-registered or not:                       [OK]
+--------------------------------------------------------------------------------
+Check if only installed assets are present on the system: 
+| Checking for presence of non-original assets...                     [OK]      
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+Upgrade finished.
+
+# satellite-maintain service stop;reboot;
+Running Stop Services
+================================================================================
+Check if command is run as root user:                                 [OK]
+--------------------------------------------------------------------------------
+Stop applicable services: 
+
+Stopping the following service(s):
+rh-mongodb34-mongod, postgresql, qdrouterd, qpidd, rh-redis5-redis, squid, pulp_celerybeat, pulp_resource_manager, pulp_streamer, pulp_workers, smart_proxy_dynflow_core, tomcat, dynflow-sidekiq@orchestrator, foreman, httpd, puppetserver, foreman.socket, dynflow-sidekiq@worker, dynflow-sidekiq@worker-hosts-queue, foreman-proxy
+| All services stopped                                                [OK]      
+--------------------------------------------------------------------------------
+
+Last login: Sat Sep 25 01:48:09 2021 
+
+# uptime
+ 05:30:55 up 16 min,  1 user,  load average: 0.76, 0.62, 0.93
+
+# rpm  -qa satellite
+satellite-6.9.6.1-1.el7sat.noarch
+
+# postgres -V
+postgres (PostgreSQL) 12.7
+
+
+
+
+
+
+
+
+
+
+
+
+
